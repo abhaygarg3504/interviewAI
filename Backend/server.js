@@ -1,0 +1,34 @@
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
+import cookieParser from "cookie-parser"
+import speechRoute from "./Routes/Speech.js"
+import authRoute from "./Routes/auth.js"
+import mongoose from "mongoose"
+import session from "express-session"
+
+const app=express()
+dotenv.config()
+
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL,process.env.TRANSFORMERS_API_URL],
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    credentials: true,
+  })
+);
+app.use(cookieParser())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/speech',speechRoute)
+app.use('/auth',authRoute)
+
+const PORT=process.env.PORT
+mongoose.connect(process.env.MONGO_URL)
+  .then(app.listen(PORT, async () => {
+    console.log("Mongodb Connected")
+    console.log(`Server running at ${PORT}`)
+    const client = mongoose.connection.getClient();
+   }))
+
